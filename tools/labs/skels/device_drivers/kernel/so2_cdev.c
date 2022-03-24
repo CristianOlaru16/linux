@@ -56,7 +56,7 @@ static int so2_cdev_open(struct inode *inode, struct file *file)
 	printk(LOG_LEVEL "open device\n");
 
 	/* TODO 3: inode->i_cdev contains our cdev struct, use container_of to obtain a pointer to so2_device_data */
-	data = container_of(inode->i_dev, structu so2_device_data, cdev);
+	data = container_of(inode->i_cdev, struct so2_device_data, cdev);
 
 	file->private_data = data;
 
@@ -149,6 +149,10 @@ so2_cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 	switch (cmd) {
 	/* TODO 6: if cmd = MY_IOCTL_PRINT, display IOCTL_MESSAGE */
+	case MY_IOCTL_PRINT:
+		printk(LOG_LEVEL "%s\n", IOCTL_MESSAGE);
+		break;
+		
 	/* TODO 7: extra tasks, for home */
 	default:
 		ret = -EINVAL;
@@ -170,6 +174,7 @@ static const struct file_operations so2_fops = {
 	.write = so2_cdev_write,
 
 /* TODO 6: add ioctl function */
+	.unlocked_ioctl = so2_cdev_ioctl
 };
 
 static int so2_cdev_init(void)
