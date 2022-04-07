@@ -44,6 +44,8 @@ static struct my_device_data {
 	unsigned int flag;
 	
 	/* TODO 3: add work */
+	struct work_struct work;
+
 	/* TODO 4: add list for monitored processes */
 	/* TODO 4: add spinlock to protect list */
 } dev;
@@ -78,9 +80,14 @@ static struct mon_proc *get_proc(pid_t pid)
 
 
 /* TODO 3: define work handler */
+static void work_handler(struct work_struct *work)
+{
+	alloc_io();
+}
 
 #define ALLOC_IO_DIRECT
 /* TODO 3: undef ALLOC_IO_DIRECT*/
+#undef ALLOC_IO_DIRECT
 
 static void timer_handler(struct timer_list *tl)
 {
@@ -94,8 +101,13 @@ static void timer_handler(struct timer_list *tl)
 		case TIMER_TYPE_SET:
 			break;
 		case TIMER_TYPE_ALLOC:
+#ifdef ALLOC_IO_DIRECT
 			alloc_io();
+#else
+			schedule_work(&my_data->work);
+#endif
 			break;
+
 		default:
 			break; 
 	}
@@ -178,7 +190,9 @@ static int deferred_init(void)
 
 	/* TODO 2: Initialize flag. */
 	dev.flag = TIMER_TYPE_NONE;
+
 	/* TODO 3: Initialize work. */
+	INIT_WORK(&dev.work, work_handler);
 
 	/* TODO 4: Initialize lock and list. */
 
@@ -202,7 +216,9 @@ static void deferred_exit(void)
 
 	/* TODO 1: Cleanup: make sure the timer is not running after exiting. */
 	del_timer_sync(&dev.timer);
+
 	/* TODO 3: Cleanup: make sure the work handler is not scheduled. */
+	flush_scheduled_work();
 
 	/* TODO 4: Cleanup the monitered process list */
 		/* TODO 4: ... decrement task usage counter ... */
