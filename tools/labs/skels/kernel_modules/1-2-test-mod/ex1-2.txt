@@ -1,0 +1,1 @@
+la 2 am dat comanda echo 5 > /proc/sys/kernel/printk pentru a modifica nivelul de log
