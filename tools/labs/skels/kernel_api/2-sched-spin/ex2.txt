@@ -1,0 +1,2 @@
+in forma din schelet, se asteapta 5 secunde si apoi se logheaza mesaul crng init done
+cu lock pe spinlock + sleep am vazut ca apare un BUG: scheduling while atomic

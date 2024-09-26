@@ -1,0 +1,1 @@
+La comanda insmod mem.ko, am observat ca se afiseaza multe caractere z
